@@ -48,11 +48,11 @@ fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> 
             }
         }
         post("/login") {
-            val signinParameters = call.receive<Parameters>()
-            val email = signinParameters["email"] ?: return@post call.respond(
+            val signInParameters = call.receive<Parameters>()
+            val email = signInParameters["email"] ?: return@post call.respond(
                 HttpStatusCode.Unauthorized, "Missing Fields"
             )
-            val password = signinParameters["password"] ?: return@post call.respond(
+            val password = signInParameters["password"] ?: return@post call.respond(
                 HttpStatusCode.Unauthorized, "Missing Fields"
             )
             val hash = hashFunction(password)
