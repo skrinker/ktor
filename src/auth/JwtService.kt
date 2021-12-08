@@ -1,10 +1,12 @@
-package dev.hashnode.danielwaiguru.auth
+package auth
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import dev.hashnode.danielwaiguru.models.User
-import java.util.*
+import models.User
+import java.util.Date
+
+const val DESTROY_TIME = 3_600_000 * 24 // 24 hours
 
 class JwtService {
 
@@ -17,7 +19,6 @@ class JwtService {
         .withIssuer(issuer)
         .build()
 
-
     fun generateToken(user: User): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
@@ -26,5 +27,5 @@ class JwtService {
         .sign(algorithm)
 
     private fun expiresAt() =
-        Date(System.currentTimeMillis() + 3_600_000 * 24) // token expires after 24 hours
+        Date(System.currentTimeMillis() + DESTROY_TIME) // token expires after 24 hours
 }

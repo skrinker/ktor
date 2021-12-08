@@ -1,30 +1,28 @@
-package dev.hashnode.danielwaiguru
+package com.example
 
-import dev.hashnode.danielwaiguru.auth.JwtService
-import dev.hashnode.danielwaiguru.auth.UserSession
-import dev.hashnode.danielwaiguru.auth.hash
-import dev.hashnode.danielwaiguru.database.DatabaseFactory
-import dev.hashnode.danielwaiguru.repos.PostRepoImpl
-import dev.hashnode.danielwaiguru.repos.UserRepoImpl
-import dev.hashnode.danielwaiguru.routes.registerPostRoutes
-import dev.hashnode.danielwaiguru.routes.registerUserRoutes
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.features.*
-import io.ktor.gson.*
-import io.ktor.locations.*
-import io.ktor.sessions.*
-import io.ktor.util.KtorExperimentalAPI
+import auth.JwtService
+import auth.UserSession
+import auth.hash
+import database.DatabaseFactory
+import io.ktor.application.Application
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.auth.jwt.jwt
+import io.ktor.features.ContentNegotiation
+import io.ktor.gson.gson
+import io.ktor.locations.Locations
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
+import repos.PostRepoImpl
+import repos.UserRepoImpl
+import routes.registerPostRoutes
+import routes.registerUserRoutes
 import kotlin.collections.set
-
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-@OptIn(KtorExperimentalAPI::class)
 @Suppress("unused") // Referenced in application.conf
-@kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
+fun Application.module() {
     DatabaseFactory.init()
     val userRepo = UserRepoImpl()
     val postRepo = PostRepoImpl()
@@ -54,10 +52,7 @@ fun Application.module(testing: Boolean = false) {
                 user
             }
         }
-
     }
     registerUserRoutes(userRepo, jwtService, hashFunction)
     registerPostRoutes(userRepo, postRepo)
 }
-
-

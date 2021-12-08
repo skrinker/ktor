@@ -1,7 +1,7 @@
-package dev.hashnode.danielwaiguru.repos
+package repos
 
-import dev.hashnode.danielwaiguru.models.Post
-import dev.hashnode.danielwaiguru.models.PostDomain
+import models.Post
+import models.PostDomain
 
 interface PostRepo {
     suspend fun publishPost(uid: Int, text: String): Post?

@@ -1,3 +1,3 @@
-package dev.hashnode.danielwaiguru.auth
+package auth
 
 class UserSession(val uid: Int)

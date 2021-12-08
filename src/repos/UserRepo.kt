@@ -1,6 +1,6 @@
-package dev.hashnode.danielwaiguru.repos
+package repos
 
-import dev.hashnode.danielwaiguru.models.User
+import models.User
 
 interface UserRepo {
     suspend fun storeUser(username: String, email: String, password: String): User?

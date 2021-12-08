@@ -1,19 +1,36 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 buildscript {
-    repositories {
-        jcenter()
-    }
-    
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
+}
+
+plugins {
+    id("application")
+    id("io.gitlab.arturbosch.detekt") version "$detekt_version"
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: 'io.gitlab.arturbosch.detekt'
 
-group 'dev.hashnode.danielwaiguru'
+detekt {
+    failFast = true
+    autoCorrect = true
+    input = files("src/")
+    config = files("./config/detekt/detekt.yml")
+    buildUponDefaultConfig = true
+}
+
 version '0.0.1'
 mainClassName = "io.ktor.server.netty.EngineMain"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
@@ -22,33 +39,34 @@ sourceSets {
     test.resources.srcDirs = ['testresources']
 }
 
-repositories {
-    mavenLocal()
-    jcenter()
-    maven { url 'https://kotlin.bintray.com/ktor' }
-    mavenCentral()
-}
-
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "io.ktor:ktor-server-netty:$ktor_version"
-    implementation "ch.qos.logback:logback-classic:$logback_version"
-    implementation "io.ktor:ktor-server-core:$ktor_version"
-    implementation "io.ktor:ktor-locations:$ktor_version"
-    implementation "io.ktor:ktor-server-sessions:$ktor_version"
-    implementation "io.ktor:ktor-auth:$ktor_version"
-    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
-    implementation "io.ktor:ktor-gson:$ktor_version"
-    implementation "ch.qos.logback:logback-classic:$logback_version"
-    implementation "io.ktor:ktor-serialization:$ktor_version"
-    implementation "org.apache.commons:commons-email:1.5"
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-locations:$ktor_version")
+    implementation("io.ktor:ktor-server-sessions:$ktor_version")
+    implementation("io.ktor:ktor-auth:$ktor_version")
+    implementation("io.ktor:ktor-auth-jwt:$ktor_version")
+    implementation("io.ktor:ktor-gson:$ktor_version")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-serialization:$ktor_version")
+    implementation("org.apache.commons:commons-email:1.5")
 
     //DB
-    implementation "org.jetbrains.exposed:exposed-core:$exposed_version"
-    implementation "org.jetbrains.exposed:exposed-dao:$exposed_version"
-    implementation "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
-    implementation "org.postgresql:postgresql:$postgres_version"
-    implementation "com.zaxxer:HikariCP:$hikaricp_version"
-    testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.postgresql:postgresql:$postgres_version")
+    implementation("com.zaxxer:HikariCP:$hikaricp_version")
+    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+}
 
+tasks.test {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }

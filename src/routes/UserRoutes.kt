@@ -1,14 +1,23 @@
-package dev.hashnode.danielwaiguru.routes
+package routes
 
-import dev.hashnode.danielwaiguru.auth.JwtService
-import dev.hashnode.danielwaiguru.auth.UserSession
-import dev.hashnode.danielwaiguru.repos.UserRepo
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import auth.JwtService
+import auth.UserSession
+import repos.UserRepo
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.log
+import io.ktor.application.application
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Parameters
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.response.respondText
+import io.ktor.routing.Route
+import io.ktor.routing.post
+import io.ktor.routing.route
+import io.ktor.routing.routing
+import io.ktor.sessions.sessions
+import io.ktor.sessions.set
 
 fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> String) {
     route("/$API_VERSION/user") {
@@ -33,8 +42,8 @@ fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> 
                         status = HttpStatusCode.Created
                     )
                 }
-            } catch (e: Throwable) {
-                application.log.error("Failed to register user", e)
+            } catch (err: Throwable) {
+                application.log.error("Failed to register user", err)
                 call.respond(HttpStatusCode.BadRequest, "User registration failed")
             }
         }
@@ -59,8 +68,8 @@ fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> 
                         )
                     }
                 }
-            } catch (e: Throwable) {
-                application.log.error("Failed to login", e)
+            } catch (err: Throwable) {
+                application.log.error("Failed to login", err)
                 call.respond(HttpStatusCode.BadRequest, "User login failed")
             }
         }
@@ -73,6 +82,4 @@ fun Application.registerUserRoutes(db: UserRepo, jwtService: JwtService, hashFun
     }
 }
 
-
 const val API_VERSION = "v1"
-

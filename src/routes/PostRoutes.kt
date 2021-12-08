@@ -1,16 +1,27 @@
-package dev.hashnode.danielwaiguru.routes
+package routes
 
-import dev.hashnode.danielwaiguru.auth.UserSession
-import dev.hashnode.danielwaiguru.models.PostDomain
-import dev.hashnode.danielwaiguru.repos.PostRepo
-import dev.hashnode.danielwaiguru.repos.UserRepo
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import auth.UserSession
+import io.ktor.application.Application
+import models.PostDomain
+import repos.PostRepo
+import repos.UserRepo
+import io.ktor.application.call
+import io.ktor.application.log
+import io.ktor.application.application
+import io.ktor.auth.authenticate
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.Parameters
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.Route
+import io.ktor.routing.delete
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.put
+import io.ktor.routing.route
+import io.ktor.routing.routing
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
 
 fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
     authenticate("jwt") {
@@ -37,8 +48,8 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                             HttpStatusCode.Created, currentPost
                         )
                     }
-                } catch (e: Throwable) {
-                    application.log.error("Error adding a post", e)
+                } catch (err: Throwable) {
+                    application.log.error("Error adding a post", err)
                     call.respond(HttpStatusCode.BadRequest, "Failed to add a post")
                 }
             }
@@ -55,8 +66,8 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                 try {
                     val posts = postRepo.getPosts(user.uid)
                     call.respond(posts)
-                } catch (e: Throwable) {
-                    application.log.error("Failed to get all posts", e)
+                } catch (err: Throwable) {
+                    application.log.error("Failed to get all posts", err)
                     call.respond(
                         HttpStatusCode.BadRequest, "Failed to get posts"
                     )
@@ -96,9 +107,8 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                             message = "Update successful"
                         )
                     }
-
-                } catch (e: Exception) {
-                    application.log.error("Failed to update a post", e)
+                } catch (err: Exception) {
+                    application.log.error("Failed to update a post", err)
                     call.respond(HttpStatusCode.BadRequest, "Post update failed")
                 }
             }
@@ -106,7 +116,9 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                 val user = call.sessions.get<UserSession>()?.let {
                     userRepo.getUser(it.uid)
                 }
-                application.log.info(user.toString())
+                with(application) {
+                    log.info(user.toString())
+                }
                 call.application.environment.log.info(user.toString())
                 call.application.environment.log.debug(user.toString())
                 if (user == null) {
@@ -130,9 +142,8 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                             HttpStatusCode.OK, "Post id $id deleted"
                         )
                     }
-
-                } catch (e: Throwable) {
-                    application.log.error("Failed to delete", e)
+                } catch (err: Throwable) {
+                    application.log.error("Failed to delete", err)
                     call.respond(
                         HttpStatusCode.BadRequest, "Failed to delete a post"
                     )

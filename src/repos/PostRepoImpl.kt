@@ -1,14 +1,18 @@
-package dev.hashnode.danielwaiguru.repos
+package repos
 
-import dev.hashnode.danielwaiguru.database.DatabaseFactory.dbQuery
-import dev.hashnode.danielwaiguru.database.Posts
-import dev.hashnode.danielwaiguru.models.Post
-import dev.hashnode.danielwaiguru.models.PostDomain
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import database.DatabaseFactory.dbQuery
+import database.Posts
+import models.Post
+import models.PostDomain
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.update
 
-class PostRepoImpl: PostRepo {
+class PostRepoImpl : PostRepo {
     override suspend fun publishPost(uid: Int, text: String): Post? {
         var statement: InsertStatement<Number>? = null
         dbQuery {
