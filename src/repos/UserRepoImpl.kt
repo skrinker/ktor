@@ -1,14 +1,14 @@
-package dev.hashnode.danielwaiguru.repos
+package repos
 
-import dev.hashnode.danielwaiguru.database.DatabaseFactory.dbQuery
-import dev.hashnode.danielwaiguru.database.Users
-import dev.hashnode.danielwaiguru.models.User
+import database.DatabaseFactory.dbQuery
+import database.Users
+import models.User
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
-class UserRepoImpl: UserRepo {
+class UserRepoImpl : UserRepo {
     override suspend fun storeUser(username: String, email: String, password: String): User? {
         var statement: InsertStatement<Number>? = null
         dbQuery {
@@ -31,7 +31,6 @@ class UserRepoImpl: UserRepo {
             password = row[Users.password]
         )
     }
-
 
     override suspend fun getUser(uid: Int): User? = dbQuery {
         Users.select { Users.uid.eq(uid) }.map { rowToUser(it) }.singleOrNull()

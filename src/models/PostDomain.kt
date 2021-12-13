@@ -1,4 +1,4 @@
-package dev.hashnode.danielwaiguru.models
+package models
 
 data class PostDomain(
     val text: String
