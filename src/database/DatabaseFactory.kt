@@ -25,7 +25,7 @@ object DatabaseFactory {
         config.jdbcUrl = System.getenv("JDBC_DATABASE_URL")
         config.maximumPoolSize = MAX_POOL_SIZE
         config.isAutoCommit = false
-        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ  "
         val user = System.getenv("DB_USER") // 3
         if (user != null) {
             config.username = user
