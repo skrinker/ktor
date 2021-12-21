@@ -35,7 +35,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                 }
                 if (user == null) {
                     call.respond(
-                        HttpStatusCode.Unauthorized, "Un authorized user"
+                        HttpStatusCode.Unauthorized, "Unauthorized user"
                     )
                     return@post
                 }
@@ -59,7 +59,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                 }
                 if (user == null) {
                     call.respond(
-                        HttpStatusCode.Unauthorized, "Un authorized user"
+                        HttpStatusCode.Unauthorized, "Unauthorized user"
                     )
                     return@get
                 }
@@ -82,7 +82,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                     userRepo.getUser(it.uid)
                 }
                 if (user == null) {
-                    call.respond(HttpStatusCode.BadRequest, "Un authorized user")
+                    call.respond(HttpStatusCode.BadRequest, "Unauthorized user")
                     return@put
                 }
                 try {

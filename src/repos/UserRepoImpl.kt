@@ -7,14 +7,16 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.update
 
 class UserRepoImpl : UserRepo {
-    override suspend fun storeUser(username: String, email: String, password: String): User? {
+    override suspend fun storeUser(username: String, email: String, about: String, password: String): User? {
         var statement: InsertStatement<Number>? = null
         dbQuery {
             statement = Users.insert { user ->
                 user[Users.username] = username
                 user[Users.email] = email
+                user[Users.about] = about
                 user[Users.password] = password
             }
         }
@@ -28,6 +30,7 @@ class UserRepoImpl : UserRepo {
             uid = row[Users.uid],
             email = row[Users.email],
             username = row[Users.username],
+            about = row[Users.about],
             password = row[Users.password]
         )
     }
@@ -39,5 +42,11 @@ class UserRepoImpl : UserRepo {
     override suspend fun getUserByEmail(email: String): User? = dbQuery {
         Users.select { Users.email.eq(email) }
             .map { rowToUser(it) }.singleOrNull()
+    }
+
+    override suspend fun updateAbout(uid: Int, newAbout: String): Int = dbQuery {
+        Users.update({ Users.uid.eq(uid) }) {
+            it[about] = newAbout
+        }
     }
 }

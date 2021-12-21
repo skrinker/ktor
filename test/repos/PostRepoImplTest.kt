@@ -1,71 +1,45 @@
+package repos
+
 import database.MAX_EMAIL_LENGTH
 import database.MAX_PASSWORD_LENGTH
 import database.MAX_POST_LENGTH
 import database.MAX_USERNAME_LENGTH
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.coroutines.runBlocking
-import models.User
-import org.jetbrains.exposed.exceptions.ExposedSQLException
+import models.Post
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import repos.UserRepoImpl
 import javax.sql.DataSource
-import kotlin.NullPointerException
 import kotlin.test.assertEquals
 
-class UserRepoImplTest {
+class PostRepoImplTest {
     private val userRepo = UserRepoImpl()
+    private val postRepo = PostRepoImpl()
+    private val storedUser = runBlocking {
+        userRepo.storeUser("a", "b", "c")
+            ?: throw NullPointerException("Store user null")
+    }
 
     @Test
-    fun storeUserTest() {
+    fun publishPostTest() {
         runBlocking {
-            val testUser = userRepo.storeUser("a", "b", "c")
-                ?: throw NullPointerException("Store user null")
+            val publishedPost = postRepo.publishPost(storedUser.uid, "text")
             val databaseResult = transaction {
-                Users.select { Users.uid.eq(testUser.uid) }.firstOrNull()
+                Posts.select { Posts.uid.eq(storedUser.uid) }.firstOrNull()
             } ?: throw NullPointerException("Database result null")
-            assertEquals(testUser, User(
-                uid = databaseResult[database.Users.uid],
-                username = databaseResult[database.Users.username],
-                email = databaseResult[database.Users.email],
-                password = databaseResult[database.Users.password])
+            assertEquals(publishedPost, Post(
+                uid = databaseResult[database.Posts.uid],
+                postId = databaseResult[database.Posts.postId],
+                text = databaseResult[database.Posts.text])
             )
-        }
-    }
-
-    @Test
-    fun storeUserDuplicate() {
-        assertThrows<ExposedSQLException> {
-            runBlocking {
-                userRepo.storeUser("a", "c", "c")
-                userRepo.storeUser("a", "c", "c")
-            }
-        }
-    }
-
-    @Test
-    fun getUserTest() {
-        runBlocking {
-            val testUser = userRepo.storeUser("a", "y", "c")
-                ?: throw NullPointerException("Store user null")
-            assertEquals(testUser, userRepo.getUser(testUser.uid))
-        }
-    }
-
-    @Test
-    fun getUserByEmail() {
-        runBlocking {
-            val testUser = userRepo.storeUser("a", "r", "c")
-                ?: throw NullPointerException("Store user null")
-            assertEquals(testUser, userRepo.getUserByEmail(testUser.email))
         }
     }
 
