@@ -14,8 +14,10 @@ import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import io.ktor.routing.put
 import io.ktor.routing.route
 import io.ktor.routing.routing
+import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
 
@@ -34,7 +36,7 @@ fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> 
                     HttpStatusCode.Unauthorized, "Missing Fields")
             val hash = hashFunction(password)
             try {
-                val newUser = db.storeUser(displayName, email, hash)
+                val newUser = db.storeUser(displayName, email, password = hash)
                 newUser?.uid?.let {
                     call.sessions.set(UserSession(it))
                     call.respondText(
@@ -47,6 +49,7 @@ fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> 
                 call.respond(HttpStatusCode.BadRequest, "User registration failed")
             }
         }
+
         post("/login") {
             val signInParameters = call.receive<Parameters>()
             val email = signInParameters["email"] ?: return@post call.respond(
@@ -71,6 +74,40 @@ fun Route.users(db: UserRepo, jwtService: JwtService, hashFunction: (String) -> 
             } catch (err: Throwable) {
                 application.log.error("Failed to login", err)
                 call.respond(HttpStatusCode.BadRequest, "User login failed")
+            }
+        }
+
+        put("/about") {
+            val aboutParams = call.receive<Parameters>()
+            val text = aboutParams["text"] ?: return@put call.respond(
+                HttpStatusCode.BadRequest, "Text field is required")
+            val user = call.sessions.get<UserSession>()?.let {
+                db.getUser(it.uid)
+            }
+            if (user == null) {
+                call.respond(HttpStatusCode.BadRequest, "Unauthorized user")
+                return@put
+            }
+            try {
+                application.log.info(user.toString())
+
+                val updatedUserId = db.updateAbout(
+                    user.uid,
+                    text)
+                if (updatedUserId < 1) {
+                    call.respond(
+                        status = HttpStatusCode.BadRequest,
+                        message = "Update not successful"
+                    )
+                } else {
+                    call.respond(
+                        status = HttpStatusCode.OK,
+                        message = "Update successful"
+                    )
+                }
+            } catch (err: Exception) {
+                application.log.error("Failed to update about", err)
+                call.respond(HttpStatusCode.BadRequest, "About update failed")
             }
         }
     }

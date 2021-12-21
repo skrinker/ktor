@@ -7,6 +7,7 @@ data class User(
     val uid: Int,
     val username: String,
     val email: String,
+    val about: String,
     val password: String
 ) : Serializable, Principal {
     companion object {
