@@ -26,6 +26,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 @Suppress("LongMethod")
 fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
+    @Suppress("ComplexMethod")
     authenticate("jwt") {
         route("/$API_VERSION/posts") {
             post("/create") {
