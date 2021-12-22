@@ -43,7 +43,7 @@ fun Application.module() {
     install(Authentication) {
         jwt("jwt") {
             verifier(jwtService.verifier) // 2
-            realm = "Todo Server"
+            realm = "Ktor-api"
             validate {
                 val payload = it.payload
                 val claim = payload.getClaim("uid")

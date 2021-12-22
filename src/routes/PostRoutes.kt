@@ -22,7 +22,9 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 
+@Suppress("ComplexMethod", "LongMethod")
 fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
     authenticate("jwt") {
         route("/$API_VERSION/posts") {
@@ -48,7 +50,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                             HttpStatusCode.Created, currentPost
                         )
                     }
-                } catch (err: Throwable) {
+                } catch (err: ExposedSQLException) {
                     application.log.error("Error adding a post", err)
                     call.respond(HttpStatusCode.BadRequest, "Failed to add a post")
                 }
@@ -66,7 +68,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                 try {
                     val posts = postRepo.getPosts(user.uid)
                     call.respond(posts)
-                } catch (err: Throwable) {
+                } catch (err: ExposedSQLException) {
                     application.log.error("Failed to get all posts", err)
                     call.respond(
                         HttpStatusCode.BadRequest, "Failed to get posts"
@@ -107,7 +109,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                             message = "Update successful"
                         )
                     }
-                } catch (err: Exception) {
+                } catch (err: ExposedSQLException) {
                     application.log.error("Failed to update a post", err)
                     call.respond(HttpStatusCode.BadRequest, "Post update failed")
                 }
@@ -142,7 +144,7 @@ fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
                             HttpStatusCode.OK, "Post id $id deleted"
                         )
                     }
-                } catch (err: Throwable) {
+                } catch (err: ExposedSQLException) {
                     application.log.error("Failed to delete", err)
                     call.respond(
                         HttpStatusCode.BadRequest, "Failed to delete a post"

@@ -4,6 +4,8 @@ import database.MAX_EMAIL_LENGTH
 import database.MAX_PASSWORD_LENGTH
 import database.MAX_POST_LENGTH
 import database.MAX_USERNAME_LENGTH
+import database.Users.autoIncrement
+import database.Users.uniqueIndex
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.coroutines.runBlocking
 import models.Post
@@ -71,13 +73,14 @@ class PostRepoImplTest {
 }
 
 object Posts : Table() {
-    val postId: Column<Int> = integer("task_id").autoIncrement()
+    val postId: Column<Int> = integer("post_id").autoIncrement()
     val uid: Column<Int> = integer("uid").references(Users.uid)
     val text = varchar("text", MAX_POST_LENGTH)
 }
 
 object Users : Table() {
-    val uid: Column<Int> = integer("uid").autoIncrement().primaryKey()
+    val uid: Column<Int> = integer("uid").autoIncrement()
+    override val primaryKey: PrimaryKey = PrimaryKey(uid)
     val username = varchar("username", MAX_USERNAME_LENGTH)
     val email = varchar("email", MAX_EMAIL_LENGTH).uniqueIndex()
     val password = varchar("password", MAX_PASSWORD_LENGTH)
