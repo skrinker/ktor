@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Fix gradlew
+        run: chmod +x gradlew
+
       - name: Run build
         run: ./gradlew build
 
