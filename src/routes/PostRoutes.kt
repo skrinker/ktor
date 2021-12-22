@@ -24,9 +24,8 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 
-@Suppress("LongMethod")
+@Suppress("ComplexMethod", "LongMethod")
 fun Route.posts(postRepo: PostRepo, userRepo: UserRepo) {
-    @Suppress("ComplexMethod")
     authenticate("jwt") {
         route("/$API_VERSION/posts") {
             post("/create") {
