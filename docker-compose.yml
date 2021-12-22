@@ -1,0 +1,38 @@
+version: "3.6"
+
+services:
+  app:
+    build: ./
+    container_name: ktor-api
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    environment:
+      - JDBC_DRIVER=org.postgresql.Driver
+      - JDBC_DATABASE_URL=jdbc:postgresql://database:5432/example?user=postgres
+      - SECRET_KEY=898748674728934843
+      - JWT_SECRET=898748674728934843
+    depends_on:
+      - database
+    networks:
+      - backend
+
+  database:
+    container_name: database
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=example
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
